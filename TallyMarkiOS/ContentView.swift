@@ -6,81 +6,70 @@
 //
 
 import SwiftUI
-import CoreData
 
 struct ContentView: View {
+    @State private var distractionCount = 0
+    @State private var resistedCount = 0
+    
+    // If using Core Data, get the managedObjectContext:
     @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+        VStack(spacing: 40) {
+            // Distraction Logged Section
+            VStack {
+                Text("Distractions")
+                    .font(.headline)
+                Text("\(distractionCount)")
+                    .font(.largeTitle)
+                Button(action: {
+                    distractionCount += 1
+                    saveEvent(type: "distracted")
+                }) {
+                    Text("Log Distraction")
+                        .padding()
+                        .background(Color.red.opacity(0.7))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
             }
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            // Distraction Resisted Section
+            VStack {
+                Text("Resisted")
+                    .font(.headline)
+                Text("\(resistedCount)")
+                    .font(.largeTitle)
+                Button(action: {
+                    resistedCount += 1
+                    saveEvent(type: "resisted")
+                }) {
+                    Text("Log Resisted")
+                        .padding()
+                        .background(Color.green.opacity(0.7))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
             }
         }
+        .padding()
     }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+    
+    // Save event to Core Data
+    private func saveEvent(type: String) {
+        let newEvent = DistractionEvent(context: viewContext)
+        newEvent.id = UUID()
+        newEvent.timestamp = Date()
+        newEvent.eventType = type
+        do {
+            try viewContext.save()
+        } catch {
+            print("Error saving event: \(error)")
         }
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
-#Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    }
 }
