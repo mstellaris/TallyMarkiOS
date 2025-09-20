@@ -20,10 +20,12 @@ struct ContentView: View {
             VStack {
                 Text("Distractions")
                     .font(.headline)
-                Text("\(distractionCount)")
-                    .font(.largeTitle)
+                // Replace number with the animated tally marks
+                TallyMarksView(count: distractionCount)
                 Button(action: {
-                    distractionCount += 1
+                    withAnimation {
+                        distractionCount += 1
+                    }
                     saveEvent(type: "distracted")
                 }) {
                     Text("Log Distraction")
@@ -37,10 +39,11 @@ struct ContentView: View {
             VStack {
                 Text("Resisted")
                     .font(.headline)
-                Text("\(resistedCount)")
-                    .font(.largeTitle)
+                TallyMarksView(count: resistedCount)
                 Button(action: {
-                    resistedCount += 1
+                    withAnimation {
+                        resistedCount += 1
+                    }
                     saveEvent(type: "resisted")
                 }) {
                     Text("Log Resisted")
