@@ -6,11 +6,62 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		11C871AF2F5A0FE50070EAF9 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11C871AE2F5A0FE50070EAF9 /* WidgetKit.framework */; };
+		11C871B12F5A0FE50070EAF9 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 11C871B02F5A0FE50070EAF9 /* SwiftUI.framework */; };
+		11C871C02F5A0FE60070EAF9 /* TallyLiveActivityExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 11C871AC2F5A0FE50070EAF9 /* TallyLiveActivityExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		11C871BE2F5A0FE60070EAF9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 11F2333C2D50593C002FE828 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 11C871AB2F5A0FE50070EAF9;
+			remoteInfo = TallyLiveActivityExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		11C871C52F5A0FE60070EAF9 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				11C871C02F5A0FE60070EAF9 /* TallyLiveActivityExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		11C871AC2F5A0FE50070EAF9 /* TallyLiveActivityExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TallyLiveActivityExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		11C871AE2F5A0FE50070EAF9 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		11C871B02F5A0FE50070EAF9 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		11F233442D50593C002FE828 /* TallyMarkiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TallyMarkiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		11C871C12F5A0FE60070EAF9 /* Exceptions for "TallyLiveActivity" folder in "TallyLiveActivityExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 11C871AB2F5A0FE50070EAF9 /* TallyLiveActivityExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		11C871B22F5A0FE50070EAF9 /* TallyLiveActivity */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				11C871C12F5A0FE60070EAF9 /* Exceptions for "TallyLiveActivity" folder in "TallyLiveActivityExtension" target */,
+			);
+			path = TallyLiveActivity;
+			sourceTree = "<group>";
+		};
 		11F233462D50593C002FE828 /* TallyMarkiOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TallyMarkiOS;
@@ -19,6 +70,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		11C871A92F5A0FE50070EAF9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11C871B12F5A0FE50070EAF9 /* SwiftUI.framework in Frameworks */,
+				11C871AF2F5A0FE50070EAF9 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		11F233412D50593C002FE828 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -29,10 +89,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		11C871AD2F5A0FE50070EAF9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				11C871AE2F5A0FE50070EAF9 /* WidgetKit.framework */,
+				11C871B02F5A0FE50070EAF9 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		11F2333B2D50593C002FE828 = {
 			isa = PBXGroup;
 			children = (
 				11F233462D50593C002FE828 /* TallyMarkiOS */,
+				11C871B22F5A0FE50070EAF9 /* TallyLiveActivity */,
+				11C871AD2F5A0FE50070EAF9 /* Frameworks */,
 				11F233452D50593C002FE828 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				11F233442D50593C002FE828 /* TallyMarkiOS.app */,
+				11C871AC2F5A0FE50070EAF9 /* TallyLiveActivityExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +120,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		11C871AB2F5A0FE50070EAF9 /* TallyLiveActivityExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11C871C22F5A0FE60070EAF9 /* Build configuration list for PBXNativeTarget "TallyLiveActivityExtension" */;
+			buildPhases = (
+				11C871A82F5A0FE50070EAF9 /* Sources */,
+				11C871A92F5A0FE50070EAF9 /* Frameworks */,
+				11C871AA2F5A0FE50070EAF9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				11C871B22F5A0FE50070EAF9 /* TallyLiveActivity */,
+			);
+			name = TallyLiveActivityExtension;
+			packageProductDependencies = (
+			);
+			productName = TallyLiveActivityExtension;
+			productReference = 11C871AC2F5A0FE50070EAF9 /* TallyLiveActivityExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		11F233432D50593C002FE828 /* TallyMarkiOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 11F233572D50593D002FE828 /* Build configuration list for PBXNativeTarget "TallyMarkiOS" */;
@@ -55,10 +149,12 @@
 				11F233402D50593C002FE828 /* Sources */,
 				11F233412D50593C002FE828 /* Frameworks */,
 				11F233422D50593C002FE828 /* Resources */,
+				11C871C52F5A0FE60070EAF9 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				11C871BF2F5A0FE60070EAF9 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				11F233462D50593C002FE828 /* TallyMarkiOS */,
@@ -77,9 +173,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					11C871AB2F5A0FE50070EAF9 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 					11F233432D50593C002FE828 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -100,11 +199,19 @@
 			projectRoot = "";
 			targets = (
 				11F233432D50593C002FE828 /* TallyMarkiOS */,
+				11C871AB2F5A0FE50070EAF9 /* TallyLiveActivityExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		11C871AA2F5A0FE50070EAF9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		11F233422D50593C002FE828 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,6 +222,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		11C871A82F5A0FE50070EAF9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		11F233402D50593C002FE828 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,7 +238,75 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		11C871BF2F5A0FE60070EAF9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 11C871AB2F5A0FE50070EAF9 /* TallyLiveActivityExtension */;
+			targetProxy = 11C871BE2F5A0FE60070EAF9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		11C871C32F5A0FE60070EAF9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TallyLiveActivity/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TallyLiveActivity;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hyperstellarlabs.TallyMarkiOS.TallyLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		11C871C42F5A0FE60070EAF9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TallyLiveActivity/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TallyLiveActivity;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hyperstellarlabs.TallyMarkiOS.TallyLiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		11F233552D50593D002FE828 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -260,6 +442,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"TallyMarkiOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -292,6 +475,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"TallyMarkiOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -317,6 +501,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		11C871C22F5A0FE60070EAF9 /* Build configuration list for PBXNativeTarget "TallyLiveActivityExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11C871C32F5A0FE60070EAF9 /* Debug */,
+				11C871C42F5A0FE60070EAF9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		11F2333F2D50593C002FE828 /* Build configuration list for PBXProject "TallyMarkiOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

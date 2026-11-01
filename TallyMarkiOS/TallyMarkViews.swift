@@ -10,19 +10,21 @@ import SwiftUI
 // A single tally mark: vertical line or a diagonal slash.
 struct TallyMarkView: View {
     var isSlash: Bool = false
+    var markHeight: CGFloat = 30
+    var markWidth: CGFloat = 2
     
     var body: some View {
         if isSlash {
-            Rectangle()
-                .frame(width: 2, height: 30)
-                // Rotate around the bottom-leading corner so that the slash
-                // originates from the bottom left of its rectangle.
-                .rotationEffect(.degrees(45), anchor: .bottomLeading)
-                // Adjust the offset to fine-tune the position.
-                .offset(x: -20, y: -5)
+            Canvas { context, size in
+                var path = Path()
+                path.move(to: CGPoint(x: 0, y: size.height))
+                path.addLine(to: CGPoint(x: size.width, y: 0))
+                context.stroke(path, with: .foreground, lineWidth: markWidth)
+            }
+            .frame(width: markHeight * 0.6, height: markHeight)
         } else {
             Rectangle()
-                .frame(width: 2, height: 30)
+                .frame(width: markWidth, height: markHeight)
         }
     }
 }
@@ -33,15 +35,16 @@ struct TallyGroupView: View {
     
     var body: some View {
         if count == 5 {
-            // A complete group: 4 vertical marks and one slash.
-            HStack(spacing: 2) {
-                ForEach(0..<4, id: \.self) { _ in
-                    TallyMarkView(isSlash: false)
+            // A complete group: 4 vertical marks with a slash overlaid.
+            ZStack {
+                HStack(spacing: 2) {
+                    ForEach(0..<4, id: \.self) { _ in
+                        TallyMarkView(isSlash: false)
+                    }
                 }
                 TallyMarkView(isSlash: true)
             }
         } else {
-            // An incomplete group: just draw the vertical tallies.
             HStack(spacing: 2) {
                 ForEach(0..<count, id: \.self) { _ in
                     TallyMarkView(isSlash: false)
@@ -55,19 +58,43 @@ struct TallyGroupView: View {
 struct TallyMarksView: View {
     let count: Int
     
+    private let columns = [GridItem(.adaptive(minimum: 30, maximum: 50))]
+    
     var body: some View {
-        // Calculate the number of complete groups of 5 and the remainder.
         let groups = count / 5
         let remainder = count % 5
+        let totalGroups = groups + (remainder > 0 ? 1 : 0)
         
-        return HStack(spacing: 8) {
-            ForEach(0..<groups, id: \.self) { _ in
-                TallyGroupView(count: 5)
+        if count == 0 {
+            Text("0")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+        } else {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
+                ForEach(0..<totalGroups, id: \.self) { index in
+                    if index < groups {
+                        TallyGroupView(count: 5)
+                    } else {
+                        TallyGroupView(count: remainder)
+                    }
+                }
             }
-            if remainder > 0 {
-                TallyGroupView(count: remainder)
-            }
+            .animation(.easeInOut, value: count)
         }
-        .animation(.easeInOut, value: count) // Animate changes to the count.
     }
+}
+
+#Preview("Tally Marks - 7") {
+    TallyMarksView(count: 7)
+        .padding()
+}
+
+#Preview("Tally Marks - 13") {
+    TallyMarksView(count: 13)
+        .padding()
+}
+
+#Preview("Tally Group - 5") {
+    TallyGroupView(count: 5)
+        .padding()
 }
