@@ -116,10 +116,24 @@ class TallyDataManager {
             resistedCount: resistedCount
         )
         let content = ActivityContent(state: state, staleDate: nil)
-        
+        let id = activity.id
+
         Task {
-            await activity.update(content)
+            await Self.update(activityID: id, with: content)
         }
+    }
+
+    // `Activity` isn't Sendable, so look it up by ID off the main actor instead of passing it across.
+    @concurrent
+    private nonisolated static func update(activityID: String, with content: ActivityContent<TallyActivityAttributes.ContentState>) async {
+        guard let activity = Activity<TallyActivityAttributes>.activities.first(where: { $0.id == activityID }) else { return }
+        await activity.update(content)
+    }
+
+    @concurrent
+    private nonisolated static func end(activityID: String, with content: ActivityContent<TallyActivityAttributes.ContentState>) async {
+        guard let activity = Activity<TallyActivityAttributes>.activities.first(where: { $0.id == activityID }) else { return }
+        await activity.end(content, dismissalPolicy: .default)
     }
     
     func endLiveActivity() {
@@ -130,12 +144,11 @@ class TallyDataManager {
             resistedCount: resistedCount
         )
         let content = ActivityContent(state: state, staleDate: nil)
-        
+        let id = activity.id
+        currentActivity = nil
+
         Task {
-            await activity.end(content, dismissalPolicy: .default)
-            await MainActor.run {
-                currentActivity = nil
-            }
+            await Self.end(activityID: id, with: content)
         }
     }
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import CoreData
 
 struct ContentView: View {
     @Environment(TallyDataManager.self) private var dataManager
