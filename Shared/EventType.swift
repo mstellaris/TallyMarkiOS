@@ -18,6 +18,14 @@ nonisolated enum EventType: String, Codable, CaseIterable, Sendable {
         }
     }
 
+    /// Fits the narrow Live Activity and widget buttons.
+    var shortTitle: LocalizedStringResource {
+        switch self {
+        case .distracted: "Distracted"
+        case .resisted: "Resisted"
+        }
+    }
+
     var logTitle: LocalizedStringResource {
         switch self {
         case .distracted: "Log Distraction"
