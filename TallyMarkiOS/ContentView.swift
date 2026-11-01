@@ -7,7 +7,6 @@
 
 import SwiftUI
 import UIKit
-import CoreData
 
 struct ContentView: View {
     @Environment(TallyDataManager.self) private var dataManager
@@ -21,11 +20,11 @@ struct ContentView: View {
                 VStack {
                     Text("Distractions")
                         .font(.headline)
-                    TallyMarksView(count: dataManager.distractionCount)
+                    TallyMarksView(count: dataManager.today.distracted)
                     Button(action: {
                         haptic.impactOccurred()
                         withAnimation {
-                            dataManager.saveEvent(type: "distracted")
+                            dataManager.log(.distracted)
                         }
                     }) {
                         Text("Log Distraction")
@@ -39,11 +38,11 @@ struct ContentView: View {
                 VStack {
                     Text("Resisted")
                         .font(.headline)
-                    TallyMarksView(count: dataManager.resistedCount)
+                    TallyMarksView(count: dataManager.today.resisted)
                     Button(action: {
                         haptic.impactOccurred()
                         withAnimation {
-                            dataManager.saveEvent(type: "resisted")
+                            dataManager.log(.resisted)
                         }
                     }) {
                         Text("Log Resisted")
@@ -60,12 +59,12 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         withAnimation {
-                            dataManager.undoLastEvent()
+                            dataManager.undoLast()
                         }
                     }) {
                         Image(systemName: "arrow.uturn.backward")
                     }
-                    .disabled(dataManager.lastEvent == nil)
+                    .disabled(!dataManager.canUndo)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: HistoryView()) {
@@ -90,14 +89,12 @@ struct ContentView: View {
                 }
             }
             .onAppear {
-                dataManager.loadTodayCounts()
+                dataManager.refresh()
             }
         }
     }
 }
 
-#Preview {
+#Preview(traits: .sampleTallies) {
     ContentView()
-        .environment(TallyDataManager(context: PersistenceController.preview.container.viewContext))
-        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

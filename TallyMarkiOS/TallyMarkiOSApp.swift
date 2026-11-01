@@ -6,23 +6,23 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 @main
 struct TallyMarkiOSApp: App {
-    let persistenceController = PersistenceController.shared
     @State private var tallyDataManager: TallyDataManager
 
     init() {
-        let context = PersistenceController.shared.container.viewContext
-        _tallyDataManager = State(initialValue: TallyDataManager(context: context))
+        // Import before the data manager loads today's counts so they include migrated history.
+        LegacyStoreImporter.importIfNeeded(into: TallyStore.container)
+        _tallyDataManager = State(initialValue: .shared)
     }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environment(tallyDataManager)
         }
+        .modelContainer(TallyStore.container)
     }
 }

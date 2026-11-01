@@ -4,7 +4,7 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 import Charts
 
 struct DaySummary: Identifiable {
@@ -15,14 +15,13 @@ struct DaySummary: Identifiable {
 }
 
 struct HistoryView: View {
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \DistractionEvent.timestamp, ascending: false)]
-    ) private var events: FetchedResults<DistractionEvent>
+    @Query(sort: \DistractionEvent.timestamp, order: .reverse)
+    private var events: [DistractionEvent]
     
     private var daySummaries: [DaySummary] {
         let calendar = Calendar.current
         let grouped = Dictionary(grouping: events) { event -> Date in
-            calendar.startOfDay(for: event.timestamp ?? Date())
+            calendar.startOfDay(for: event.timestamp)
         }
         return grouped.map { (date, events) in
             DaySummary(
@@ -90,9 +89,8 @@ struct HistoryView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .sampleTallies) {
     NavigationStack {
         HistoryView()
-            .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
