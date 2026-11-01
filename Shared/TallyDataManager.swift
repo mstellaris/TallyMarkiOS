@@ -28,6 +28,8 @@ final class TallyDataManager {
     private let logger = Logger(subsystem: "com.hyperstellarlabs.TallyMarkiOS", category: "TallyDataManager")
 
     private var activityID: String?
+    /// The day and counts last sent to the Live Activity, to avoid redundant updates on every foreground.
+    private var lastPushed: (day: Date, counts: DayCounts)?
     private var activityObservation: Task<Void, Never>?
 
     init(container: ModelContainer, calendar: Calendar = .current, now: @escaping () -> Date = { .now }) {
@@ -88,6 +90,7 @@ final class TallyDataManager {
                 pushType: nil
             )
             track(activity)
+            lastPushed = (day, today)
         } catch {
             logger.error("Couldn't start Live Activity: \(error)")
         }
@@ -103,7 +106,8 @@ final class TallyDataManager {
     }
 
     private func updateLiveActivity() {
-        guard let id = activityID else { return }
+        guard let id = activityID, lastPushed?.day != day || lastPushed?.counts != today else { return }
+        lastPushed = (day, today)
         let content = activityContent()
         Task {
             await Self.update(activityID: id, with: content)
@@ -140,6 +144,7 @@ final class TallyDataManager {
         activityObservation?.cancel()
         activityObservation = nil
         activityID = nil
+        lastPushed = nil
         isLiveActivityActive = false
     }
 
@@ -153,6 +158,6 @@ final class TallyDataManager {
     @concurrent
     private nonisolated static func end(activityID: String, with content: ActivityContent<DayCounts>) async {
         guard let activity = Activity<TallyActivityAttributes>.activities.first(where: { $0.id == activityID }) else { return }
-        await activity.end(content, dismissalPolicy: .default)
+        await activity.end(content, dismissalPolicy: .immediate)
     }
 }

@@ -11,6 +11,8 @@ import UIKit
 struct ContentView: View {
     @Environment(TallyDataManager.self) private var dataManager
     @Environment(\.scenePhase) private var scenePhase
+    /// Bumped on each log/undo tap so haptics don't fire for refreshes or the midnight reset.
+    @State private var feedback: (tap: Int, feedback: SensoryFeedback) = (0, .increase)
 
     var body: some View {
         NavigationStack {
@@ -23,6 +25,7 @@ struct ContentView: View {
                         TallySection(type: type, count: dataManager.today[type]) {
                             withAnimation {
                                 dataManager.log(type)
+                                feedback = (feedback.tap + 1, .increase)
                             }
                         }
                     }
@@ -37,6 +40,7 @@ struct ContentView: View {
                     Button("Undo", systemImage: "arrow.uturn.backward") {
                         withAnimation {
                             dataManager.undoLast()
+                            feedback = (feedback.tap + 1, .decrease)
                         }
                     }
                     .disabled(!dataManager.canUndo)
@@ -49,9 +53,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .sensoryFeedback(trigger: dataManager.today.total) { oldTotal, newTotal in
-                newTotal > oldTotal ? .increase : .decrease
-            }
+            .sensoryFeedback(trigger: feedback.tap) { _, _ in feedback.feedback }
             // Reload when returning to the app (it may have been logged to from the Live Activity, or a new
             // day may have started) and at midnight while the app stays open.
             .onChange(of: scenePhase, initial: true) { _, phase in
