@@ -39,10 +39,11 @@ private struct HistoryChart: View {
     let days: [DaySummary]
 
     var body: some View {
+        // Plot each day as its own category so every day, including today, gets an equal-width column.
         Chart(days) { day in
             ForEach(EventType.allCases, id: \.self) { type in
                 BarMark(
-                    x: .value("Date", day.date, unit: .day),
+                    x: .value("Date", Self.columnLabel(for: day.date)),
                     y: .value("Count", day.counts[type])
                 )
                 .foregroundStyle(by: .value("Type", String(localized: type.shortTitle)))
@@ -54,11 +55,22 @@ private struct HistoryChart: View {
             range: EventType.allCases.map(\.color)
         )
         .chartXAxis {
-            AxisMarks(values: .stride(by: .day, count: 2)) {
-                AxisGridLine()
-                AxisValueLabel(format: .dateTime.day().month(.abbreviated))
+            // Label every third day counting back from today, so today is always labeled.
+            AxisMarks { value in
+                if let column = value.as(String.self), labeledColumns.contains(column) {
+                    AxisValueLabel()
+                }
             }
         }
+    }
+
+    private var labeledColumns: [String] {
+        stride(from: days.count - 1, through: 0, by: -3).map { Self.columnLabel(for: days[$0].date) }
+    }
+
+    /// Unique within the chart's 14-day window.
+    private static func columnLabel(for date: Date) -> String {
+        date.formatted(.dateTime.month(.abbreviated).day())
     }
 }
 
@@ -76,10 +88,11 @@ private struct HistoryRow: View {
                     Image(systemName: type.systemImage)
                 }
                 .foregroundStyle(type.color)
-                .accessibilityLabel(Text("\(summary.counts[type]) \(type.title)"))
             }
         }
-        .accessibilityElement(children: .combine)
+        // Explicit label: combining children would also pull in the symbols' own traits (e.g. "Selected").
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(summary.date, format: .dateTime.weekday(.wide).month(.wide).day()): \(summary.counts.distracted) \(EventType.distracted.title), \(summary.counts.resisted) \(EventType.resisted.title)"))
     }
 }
 

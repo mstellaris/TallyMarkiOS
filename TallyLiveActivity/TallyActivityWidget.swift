@@ -82,7 +82,9 @@ struct TallyCountLabel: View {
                 .font(.title.bold())
                 .contentTransition(.numericText(value: Double(count)))
         }
-        .accessibilityElement(children: .combine)
+        // Explicit label: combining children would also pull in the symbol's own traits (e.g. "Selected").
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(type.title): \(count)"))
     }
 }
 

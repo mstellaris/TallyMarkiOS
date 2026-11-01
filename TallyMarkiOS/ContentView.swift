@@ -89,7 +89,9 @@ private struct TallySection: View {
                     .monospacedDigit()
                     .contentTransition(.numericText(value: Double(count)))
             }
-            .accessibilityElement(children: .combine)
+            // Explicit label: combining children would also pull in the symbol's own traits (e.g. "Selected").
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("\(type.title): \(count)"))
 
             TallyMarksView(count: count)
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)

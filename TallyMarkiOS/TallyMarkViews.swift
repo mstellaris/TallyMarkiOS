@@ -99,7 +99,7 @@ struct TallyMarksView: View {
                 .animation(.easeInOut, value: count)
                 // The marks are purely visual; read the number instead of each line.
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text("\(count) tally marks"))
+                .accessibilityLabel(Text("^[\(count) tally mark](inflect: true)"))
             }
         }
     }
