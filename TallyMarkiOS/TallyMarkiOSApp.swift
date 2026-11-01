@@ -15,6 +15,9 @@ struct TallyMarkiOSApp: App {
     init() {
         // Import before the data manager loads today's counts so they include migrated history.
         LegacyStoreImporter.importIfNeeded(into: TallyStore.container)
+        #if DEBUG
+        DebugHistorySeeder.seedIfRequested(into: TallyStore.container)
+        #endif
         _tallyDataManager = State(initialValue: .shared)
     }
 

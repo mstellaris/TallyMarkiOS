@@ -77,22 +77,32 @@ private struct HistoryChart: View {
 private struct HistoryRow: View {
     let summary: DaySummary
 
+    // Fixed-width count columns so icons line up from row to row; scales with Dynamic Type.
+    @ScaledMetric(relativeTo: .body) private var countWidth: CGFloat = 28
+
     var body: some View {
         HStack {
             Text(summary.date, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated).year())
             Spacer()
             ForEach(EventType.allCases, id: \.self) { type in
-                Label {
-                    Text(summary.counts[type], format: .number)
-                } icon: {
+                HStack(spacing: 4) {
                     Image(systemName: type.systemImage)
+                    Text(summary.counts[type], format: .number)
+                        .monospacedDigit()
+                        .frame(minWidth: countWidth, alignment: .trailing)
                 }
                 .foregroundStyle(type.color)
             }
         }
+        // Start the separator under the date rather than under the variable-width counts.
+        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
         // Explicit label: combining children would also pull in the symbols' own traits (e.g. "Selected").
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("\(summary.date, format: .dateTime.weekday(.wide).month(.wide).day()): \(summary.counts.distracted) \(EventType.distracted.title), \(summary.counts.resisted) \(EventType.resisted.title)"))
+        .accessibilityLabel(Text("""
+            \(Text(summary.date, format: .dateTime.weekday(.wide).month(.wide).day())): \
+            \(Text(EventType.distracted.countDescription(summary.counts.distracted))), \
+            \(Text(EventType.resisted.countDescription(summary.counts.resisted)))
+            """))
     }
 }
 

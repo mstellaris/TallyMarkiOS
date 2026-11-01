@@ -33,6 +33,14 @@ nonisolated enum EventType: String, Codable, CaseIterable, Sendable {
         }
     }
 
+    /// "1 Distraction", "3 Distractions", "2 Resisted", with grammatical agreement.
+    func countDescription(_ count: Int) -> LocalizedStringResource {
+        switch self {
+        case .distracted: "^[\(count) Distraction](inflect: true)"
+        case .resisted: "\(count) Resisted"
+        }
+    }
+
     var color: Color {
         switch self {
         case .distracted: .red
