@@ -1,19 +1,32 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-The SwiftUI entry point lives in `TallyMarkiOS/TallyMarkiOSApp.swift`, bootstrapping the main scene with the shared `PersistenceController`. Feature views are under `TallyMarkiOS/`, with `ContentView.swift` orchestrating tally state and delegating rendering to `TallyMarkViews.swift`. Persistent storage is defined in `TallyMarkiOS.xcdatamodeld` and surfaced through helper code in `Persistence.swift`. Assets for icons and colors belong in `TallyMarkiOS/Assets.xcassets`, while preview mocks sit under `TallyMarkiOS/Preview Content`.
+## Project Structure
+- `TallyMarkiOS/` — the app target. `TallyMarkiOSApp.swift` runs the one-time legacy import and injects
+  `TallyDataManager.shared`. `ContentView.swift` is today's tally, `HistoryView.swift` the chart and per-day list,
+  `DaySummary.swift` the day-grouping logic, `TallyMarkViews.swift` the tally-mark drawing.
+- `Shared/` — compiled into **both** the app and the widget extension: the SwiftData model (`DistractionEvent`,
+  `DayCounts`), `TallyStore` (App Group container and queries), `TallyDataManager`, `TallyActivityAttributes`,
+  `EventType`, and `LogEventIntent`.
+- `TallyLiveActivity/` — the widget extension: the Live Activity (`TallyActivityWidget.swift`) and the
+  Home/Lock Screen widget (`TodayWidget.swift`).
+- `TallyMarkiOSTests/` — Swift Testing unit tests, hosted in the app.
+- `Design/` — app icon source (`AppIcon-foreground.svg` for Icon Composer, `make_icon.swift` to regenerate the PNGs).
 
-## Build, Test, and Development Commands
-Open the project in Xcode via `open TallyMarkiOS.xcodeproj` to run on a simulator. For headless CI, run `xcodebuild -scheme TallyMarkiOS -destination 'platform=iOS Simulator,name=iPhone 15' build` to verify compilation. Execute the Core Data-backed UI tests with `xcodebuild -scheme TallyMarkiOS -destination 'platform=iOS Simulator,name=iPhone 15' test` once the test target exists. Use `swift run` sparingly; this app is Xcode-driven.
+## Data
+- Storage is SwiftData in the App Group `group.com.hyperstellarlabs.TallyMarkiOS`, so the extension can read it.
+- `TallyMarkiOS.xcdatamodeld` is the **legacy** Core Data model, kept only so `LegacyStoreImporter` can copy
+  pre-SwiftData history once. Don't add to it. Its old store file is left on disk as a backup.
+- `TallyDataManager` is the single owner of today's counts. `LogEventIntent` is a `LiveActivityIntent`, so it runs
+  in the app process and calls `TallyDataManager.shared` — keep writes going through it.
 
-## Coding Style & Naming Conventions
-Adopt Swift's standard four-space indentation and 100-character soft wrap. Favor SwiftUI's declarative naming—e.g., `TallyMarksView` and `DistractionEvent`—and keep view structs noun-based. Run Xcode's `Editor > Format > Re-Indent` or `Shift+Option+F` before committing to stay consistent. Keep Core Data entity names singular and align attributes with camelCase properties.
+## Build & Test
+- Requires Xcode 26+; deployment target iOS 26.0; Swift 6 with `MainActor` default isolation in every target.
+  Types used by ActivityKit, WidgetKit timeline providers, or SwiftData off the main actor are marked `nonisolated`.
+- Build: `xcodebuild -scheme TallyMarkiOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
+- Test: `xcodebuild -scheme TallyMarkiOSTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`
+- Pass an explicit `calendar` and `now` to `TallyDataManager` in tests (see `TallyDataManagerTests`).
 
-## Testing Guidelines
-Add unit or snapshot tests under a `TallyMarkiOSTests` target, using `XCTestCase` subclasses named `<Feature>Tests` (e.g., `TallyMarksViewTests`). Stub Core Data dependencies via in-memory containers modeled after `PersistenceController.preview`. Ensure new behavior is covered by at least one test or SwiftUI preview scenario, and document simulator requirements in the test method comments.
-
-## Commit & Pull Request Guidelines
-Commits in this repo are short and in present tense (see `First commit`), so continue writing concise imperative subjects under 65 characters, optionally prefixed with the touched area (`UI: Add animated tally marks`). Each PR should summarize scope, list key testing steps (`xcodebuild … test`), note Core Data migrations, and include before/after screenshots whenever UI changes are visible. Link issues using GitHub keywords (`Fixes #123`) so automation can close them on merge.
-
-## Core Data & State Tips
-When editing `TallyMarkiOS.xcdatamodeld`, bump model versions and run lightweight migrations through Xcode before pushing. Keep tally counts source-of-truth in a single SwiftUI state owner and persist via `DistractionEvent` writes; avoid duplicating managed object contexts across views to prevent merge conflicts.
+## Style
+- Four-space indentation; SwiftUI views are noun-named structs. Use `#Preview(traits: .sampleTallies)` for previews
+  that need data.
+- Commits: short imperative subjects under 65 characters, optionally prefixed with the area (`UI: …`, `Data: …`).
