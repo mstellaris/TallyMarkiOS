@@ -15,6 +15,8 @@ import WidgetKit
 final class TallyDataManager {
     static let shared = TallyDataManager(container: TallyStore.container)
 
+    /// The start of the day `today` counts. Changes at midnight on the next `refresh()`.
+    private(set) var day = Date.now
     private(set) var today = DayCounts()
     private(set) var isLiveActivityActive = false
 
@@ -37,8 +39,10 @@ final class TallyDataManager {
 
     /// Reloads today's counts. Call when the app becomes active or the day changes, so counts reset at midnight.
     func refresh() {
+        let date = now()
+        day = calendar.startOfDay(for: date)
         do {
-            today = try TallyStore.counts(on: now(), in: context, calendar: calendar)
+            today = try TallyStore.counts(on: date, in: context, calendar: calendar)
         } catch {
             logger.error("Couldn't load today's counts: \(error)")
         }

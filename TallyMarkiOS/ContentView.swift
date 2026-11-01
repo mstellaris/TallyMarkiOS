@@ -11,83 +11,46 @@ import UIKit
 struct ContentView: View {
     @Environment(TallyDataManager.self) private var dataManager
     @Environment(\.scenePhase) private var scenePhase
-    
-    private let haptic = UIImpactFeedbackGenerator(style: .medium)
-    
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 40) {
-                // Distraction Logged Section
-                VStack {
-                    Text("Distractions")
-                        .font(.headline)
-                    TallyMarksView(count: dataManager.today.distracted)
-                    Button(action: {
-                        haptic.impactOccurred()
-                        withAnimation {
-                            dataManager.log(.distracted)
-                        }
-                    }) {
-                        Text("Log Distraction")
-                            .padding()
-                            .background(Color.red.opacity(0.7))
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
+            ScrollView {
+                VStack(spacing: 20) {
+                    if TallyStore.shared.loadError != nil {
+                        StoreErrorBanner()
                     }
-                }
-                // Distraction Resisted Section
-                VStack {
-                    Text("Resisted")
-                        .font(.headline)
-                    TallyMarksView(count: dataManager.today.resisted)
-                    Button(action: {
-                        haptic.impactOccurred()
-                        withAnimation {
-                            dataManager.log(.resisted)
+                    ForEach(EventType.allCases, id: \.self) { type in
+                        TallySection(type: type, count: dataManager.today[type]) {
+                            withAnimation {
+                                dataManager.log(type)
+                            }
                         }
-                    }) {
-                        Text("Log Resisted")
-                            .padding()
-                            .background(Color.green.opacity(0.7))
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
                     }
+                    LiveActivityToggle()
                 }
+                .padding()
             }
-            .padding()
             .navigationTitle("Tally Mark")
+            .navigationSubtitle(Text(dataManager.day, format: .dateTime.weekday(.wide).month(.wide).day()))
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Undo", systemImage: "arrow.uturn.backward") {
                         withAnimation {
                             dataManager.undoLast()
                         }
-                    }) {
-                        Image(systemName: "arrow.uturn.backward")
                     }
                     .disabled(!dataManager.canUndo)
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: HistoryView()) {
-                        Image(systemName: "clock.arrow.circlepath")
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        HistoryView()
+                    } label: {
+                        Label("History", systemImage: "clock.arrow.circlepath")
                     }
                 }
             }
-            .toolbar {
-                ToolbarItem(placement: .bottomBar) {
-                    Button(action: {
-                        if dataManager.isLiveActivityActive {
-                            dataManager.endLiveActivity()
-                        } else {
-                            dataManager.startLiveActivity()
-                        }
-                    }) {
-                        Label(
-                            dataManager.isLiveActivityActive ? "Stop Live Activity" : "Start Live Activity",
-                            systemImage: dataManager.isLiveActivityActive ? "stop.circle" : "play.circle"
-                        )
-                    }
-                }
+            .sensoryFeedback(trigger: dataManager.today.total) { oldTotal, newTotal in
+                newTotal > oldTotal ? .increase : .decrease
             }
             // Reload when returning to the app (it may have been logged to from the Live Activity, or a new
             // day may have started) and at midnight while the app stays open.
@@ -102,6 +65,95 @@ struct ContentView: View {
                 }
             }
         }
+    }
+}
+
+private struct TallySection: View {
+    let type: EventType
+    let count: Int
+    let log: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Label {
+                    Text(type.title)
+                } icon: {
+                    Image(systemName: type.systemImage)
+                }
+                .font(.headline)
+                .foregroundStyle(type.color)
+                Spacer()
+                Text(count, format: .number)
+                    .font(.title2.bold())
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(count)))
+            }
+            .accessibilityElement(children: .combine)
+
+            TallyMarksView(count: count)
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+
+            Button {
+                log()
+            } label: {
+                Label {
+                    Text(type.logTitle)
+                } icon: {
+                    Image(systemName: "plus")
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.glassProminent)
+            .controlSize(.large)
+            .tint(type.color)
+        }
+        .padding()
+        .background(.background.secondary, in: .rect(cornerRadius: 24))
+    }
+}
+
+private struct LiveActivityToggle: View {
+    @Environment(TallyDataManager.self) private var dataManager
+
+    var body: some View {
+        Toggle(isOn: Binding(
+            get: { dataManager.isLiveActivityActive },
+            set: { isOn in
+                if isOn {
+                    dataManager.startLiveActivity()
+                } else {
+                    dataManager.endLiveActivity()
+                }
+            }
+        )) {
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Show on Lock Screen")
+                    Text("Log from the Lock Screen and Dynamic Island.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } icon: {
+                Image(systemName: "platter.filled.bottom.iphone")
+            }
+        }
+        .padding()
+        .background(.background.secondary, in: .rect(cornerRadius: 24))
+    }
+}
+
+private struct StoreErrorBanner: View {
+    var body: some View {
+        Label(
+            "Tallies can't be saved right now. Anything you log will be lost when the app closes.",
+            systemImage: "exclamationmark.triangle.fill"
+        )
+        .font(.callout)
+        .foregroundStyle(.orange)
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.orange.opacity(0.12), in: .rect(cornerRadius: 16))
     }
 }
 

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Foreground layer for Icon Composer: four tally strokes and a slash. -->
+  <g stroke="#FFFFFF" stroke-linecap="round" fill="none">
+    <g stroke-width="56">
+      <line x1="332" y1="292" x2="332" y2="732"/>
+      <line x1="452" y1="292" x2="452" y2="732"/>
+      <line x1="572" y1="292" x2="572" y2="732"/>
+      <line x1="692" y1="292" x2="692" y2="732"/>
+    </g>
+    <line x1="252" y1="672" x2="772" y2="352" stroke-width="60"/>
+  </g>
+</svg>
