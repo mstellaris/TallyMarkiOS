@@ -3,89 +3,83 @@
 //  TallyMarkiOS
 //
 
-import SwiftUI
-import SwiftData
 import Charts
-
-struct DaySummary: Identifiable {
-    let id = UUID()
-    let date: Date
-    let distractedCount: Int
-    let resistedCount: Int
-}
+import SwiftData
+import SwiftUI
 
 struct HistoryView: View {
     @Query(sort: \DistractionEvent.timestamp, order: .reverse)
     private var events: [DistractionEvent]
-    
-    private var daySummaries: [DaySummary] {
-        let calendar = Calendar.current
-        let grouped = Dictionary(grouping: events) { event -> Date in
-            calendar.startOfDay(for: event.timestamp)
-        }
-        return grouped.map { (date, events) in
-            DaySummary(
-                date: date,
-                distractedCount: events.filter { $0.eventType == "distracted" }.count,
-                resistedCount: events.filter { $0.eventType == "resisted" }.count
-            )
-        }
-        .sorted { $0.date > $1.date }
-    }
-    
-    private var chartSummaries: [DaySummary] {
-        Array(daySummaries.suffix(14).reversed())
-    }
-    
+
     var body: some View {
+        let summaries = DaySummary.summaries(for: events)
+
         List {
-            // Chart section
             Section("Last 14 Days") {
-                Chart {
-                    ForEach(chartSummaries) { summary in
-                        BarMark(
-                            x: .value("Date", summary.date, unit: .day),
-                            y: .value("Count", summary.distractedCount)
-                        )
-                        .foregroundStyle(.red.opacity(0.7))
-                        .position(by: .value("Type", "Distracted"))
-                        
-                        BarMark(
-                            x: .value("Date", summary.date, unit: .day),
-                            y: .value("Count", summary.resistedCount)
-                        )
-                        .foregroundStyle(.green.opacity(0.7))
-                        .position(by: .value("Type", "Resisted"))
-                    }
-                }
-                .chartForegroundStyleScale([
-                    "Distracted": Color.red.opacity(0.7),
-                    "Resisted": Color.green.opacity(0.7)
-                ])
-                .frame(height: 200)
-                .padding(.vertical, 8)
+                HistoryChart(days: DaySummary.recentDays(14, endingOn: .now, from: summaries))
+                    .frame(height: 200)
+                    .padding(.vertical, 8)
             }
-            
-            // Day-by-day list
+
             Section("All Days") {
-                if daySummaries.isEmpty {
-                    Text("No events recorded yet.")
-                        .foregroundStyle(.secondary)
+                if summaries.isEmpty {
+                    ContentUnavailableView("No Tallies Yet", systemImage: "chart.bar", description: Text("Logged distractions and resisted moments appear here."))
                 } else {
-                    ForEach(daySummaries) { summary in
-                        HStack {
-                            Text(summary.date, style: .date)
-                            Spacer()
-                            Label("\(summary.distractedCount)", systemImage: "xmark.circle")
-                                .foregroundStyle(.red)
-                            Label("\(summary.resistedCount)", systemImage: "checkmark.circle")
-                                .foregroundStyle(.green)
-                        }
+                    ForEach(summaries) { summary in
+                        HistoryRow(summary: summary)
                     }
                 }
             }
         }
         .navigationTitle("History")
+    }
+}
+
+private struct HistoryChart: View {
+    let days: [DaySummary]
+
+    var body: some View {
+        Chart(days) { day in
+            ForEach(EventType.allCases, id: \.self) { type in
+                BarMark(
+                    x: .value("Date", day.date, unit: .day),
+                    y: .value("Count", day.counts[type])
+                )
+                .foregroundStyle(by: .value("Type", String(localized: type.shortTitle)))
+                .position(by: .value("Type", String(localized: type.shortTitle)))
+            }
+        }
+        .chartForegroundStyleScale(
+            domain: EventType.allCases.map { String(localized: $0.shortTitle) },
+            range: EventType.allCases.map(\.color)
+        )
+        .chartXAxis {
+            AxisMarks(values: .stride(by: .day, count: 2)) {
+                AxisGridLine()
+                AxisValueLabel(format: .dateTime.day().month(.abbreviated))
+            }
+        }
+    }
+}
+
+private struct HistoryRow: View {
+    let summary: DaySummary
+
+    var body: some View {
+        HStack {
+            Text(summary.date, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated).year())
+            Spacer()
+            ForEach(EventType.allCases, id: \.self) { type in
+                Label {
+                    Text(summary.counts[type], format: .number)
+                } icon: {
+                    Image(systemName: type.systemImage)
+                }
+                .foregroundStyle(type.color)
+                .accessibilityLabel(Text("\(summary.counts[type]) \(type.title)"))
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

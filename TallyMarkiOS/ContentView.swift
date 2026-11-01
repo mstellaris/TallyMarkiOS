@@ -10,6 +10,7 @@ import UIKit
 
 struct ContentView: View {
     @Environment(TallyDataManager.self) private var dataManager
+    @Environment(\.scenePhase) private var scenePhase
     
     private let haptic = UIImpactFeedbackGenerator(style: .medium)
     
@@ -88,8 +89,17 @@ struct ContentView: View {
                     }
                 }
             }
-            .onAppear {
-                dataManager.refresh()
+            // Reload when returning to the app (it may have been logged to from the Live Activity, or a new
+            // day may have started) and at midnight while the app stays open.
+            .onChange(of: scenePhase, initial: true) { _, phase in
+                if phase == .active {
+                    dataManager.refresh()
+                }
+            }
+            .task {
+                for await _ in NotificationCenter.default.notifications(named: UIApplication.significantTimeChangeNotification) {
+                    dataManager.refresh()
+                }
             }
         }
     }
