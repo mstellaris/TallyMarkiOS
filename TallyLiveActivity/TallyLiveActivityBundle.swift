@@ -11,6 +11,7 @@ import SwiftUI
 @main
 struct TallyLiveActivityBundle: WidgetBundle {
     var body: some Widget {
+        TodayWidget()
         TallyActivityWidget()
     }
 }
