@@ -1,5 +1,7 @@
 # Tally Mark
 
+[![Tests](https://github.com/mstellaris/TallyMarkiOS/actions/workflows/test.yml/badge.svg)](https://github.com/mstellaris/TallyMarkiOS/actions/workflows/test.yml)
+
 An iPhone app for counting distractions. Each time you notice a pull toward distraction, tap once:
 **Distracted** if you gave in, **Resisted** if you didn't. Today's counts are drawn as tally marks and
 reset at midnight; History shows a chart and a per-day list.
