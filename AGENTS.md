@@ -21,9 +21,13 @@
 
 ## Build & Test
 - Requires Xcode 26+; deployment target iOS 26.0; Swift 6 with `MainActor` default isolation in every target.
-  Types used by ActivityKit, WidgetKit timeline providers, or SwiftData off the main actor are marked `nonisolated`.
+  Types used by ActivityKit, WidgetKit timeline providers, App Intents, or SwiftData off the main actor are marked
+  `nonisolated` — and so are extensions that add protocol conformances to them (e.g. `nonisolated extension EventType:
+  AppEnum`). Xcode 26 otherwise infers a main-actor-isolated conformance and fails to build; newer Xcodes accept it.
 - Build: `xcodebuild -scheme TallyMarkiOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
 - Test: `xcodebuild -scheme TallyMarkiOSTests -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test`
+- CI (`.github/workflows/test.yml`) builds and tests every push and PR to `main` with Xcode 26.6, the oldest
+  supported Xcode. Keep the workflow's `runs-on` image and `DEVELOPER_DIR` in step when moving it.
 - Pass an explicit `calendar` and `now` to `TallyDataManager` in tests (see `TallyDataManagerTests`).
 
 ## Style
