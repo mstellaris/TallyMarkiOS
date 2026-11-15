@@ -56,7 +56,7 @@ nonisolated enum EventType: String, Codable, CaseIterable, Sendable {
     }
 }
 
-extension EventType: AppEnum {
+nonisolated extension EventType: AppEnum {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "Tally Type"
 
     static let caseDisplayRepresentations: [EventType: DisplayRepresentation] = [
